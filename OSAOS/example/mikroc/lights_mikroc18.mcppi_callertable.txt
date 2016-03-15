@@ -1,0 +1,31 @@
+main
+	Task_Rolling
+		_OS_InitDelay
+		_OS_ReturnSave
+			_OS_SET_FSR_CUR_TASK
+	Task_SetSpeed
+		_OS_EnterWaitMode
+			_OS_ClrReadySetClrCanContinue
+				_OS_SET_FSR_CUR_TASK
+		_OS_CheckEvent
+			_OS_SET_FSR_CUR_TASK
+		_OS_InitDelay
+		_OS_ReturnSave
+			_OS_SET_FSR_CUR_TASK
+	Task_Button
+		_OS_EnterWaitMode
+			_OS_ClrReadySetClrCanContinue
+				_OS_SET_FSR_CUR_TASK
+		_OS_CheckEvent
+			_OS_SET_FSR_CUR_TASK
+		_OS_InitDelay
+		_OS_ReturnSave
+			_OS_SET_FSR_CUR_TASK
+	Init
+	OS_Init
+	_OS_Task_Create
+	_OS_JumpToTask
+		_OS_SET_FSR_CUR_TASK
+	_OS_SET_FSR_CUR_TASK
+interrupt
+	OS_Timer

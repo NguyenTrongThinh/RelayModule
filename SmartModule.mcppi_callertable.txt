@@ -1,0 +1,15 @@
+main
+	serial_init
+		UART1_Init
+	RTC_init
+		I2C1_Init
+	OS_Init
+		_OS_ReturnSave
+			__OS_SET_FSR_CUR_TASK
+	systick_init
+	Mul_8X8_U
+	__OS_SET_FSR_CUR_TASK
+	_OS_JumpToTask
+		__OS_SET_FSR_CUR_TASK
+systick_INT
+	Mul_8X8_U

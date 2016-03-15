@@ -1,0 +1,35 @@
+0	1	mikroCPIC1618.exe -MSF -DBG -pP16F887 -RA -LHF -GC -DL -O11111115 -fo20 -N"D:\PIC\RelayModule\SmartModule.mcppi" -SP"C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\Defs\" -SP"C:\Users\Public\Documents\Mikroelektronika\mikroC PRO for PIC\Uses\P16\" -SP"D:\PIC\RelayModule\" -SP"D:\PIC\RelayModule\OSAOS\" -SP"D:\PIC\RelayModule\module\" -SP"D:\PIC\RelayModule\" -IP"D:\PIC\RelayModule\OSAOS\" -IP"D:\PIC\RelayModule\module\" -IP"D:\PIC\RelayModule\" "osa.c" "main.c" "relay.c" "lcd16x2.c" "serial.c" "rtc.c" "__Lib_Math.mcl" "__Lib_MathDouble.mcl" "__Lib_System.mcl" "__Lib_Delays.mcl" "__Lib_CType.mcl" "__Lib_CString.mcl" "__Lib_CStdlib.mcl" "__Lib_CMath.mcl" "__Lib_Conversions.mcl" "__Lib_ADC_88X.mcl" "__Lib_I2C_c34.mcl" "__Lib_UART_c67.mcl" "__Lib_LcdConsts.mcl" "__Lib_Lcd.mcl"	 
+hint: 0	1139	Available RAM: 352 [bytes], Available ROM: 8192 [bytes]	 
+diagnostics: 0	122	Compilation Started	P16F887.c
+diagnostics: 973	123	Compiled Successfully	P16F887.c
+diagnostics: 0	122	Compilation Started	__Lib_Delays.c
+diagnostics: 123	123	Compiled Successfully	__Lib_Delays.c
+diagnostics: 0	122	Compilation Started	osa.h
+diagnostics: 36	123	Compiled Successfully	osa_tasks.c
+hint: 228	1164	Variable 'temp' has been eliminated by optimizer	osa_tasks.c
+hint: 256	1164	Variable 'temp' has been eliminated by optimizer	osa_tasks.c
+hint: 283	1164	Variable 'temp' has been eliminated by optimizer	osa_tasks.c
+hint: 333	1164	Variable 'temp' has been eliminated by optimizer	osa_tasks.c
+hint: 395	1164	Variable 'temp' has been eliminated by optimizer	osa_tasks.c
+hint: 217	1164	Variable 'msg_temp' has been eliminated by optimizer	osa_tasks.c
+hint: 3	1354	 warning: "/*" within comment     /**************************************************************************/	D:\PIC\RelayModule\main.c
+diagnostics: 0	122	Compilation Started	osa.h
+hint: 0	1004	interrupt handler (systick_INT at 0x0004)	main.c
+diagnostics: 35	123	Compiled Successfully	main.c
+diagnostics: 0	122	Compilation Started	relay.h
+diagnostics: 0	123	Compiled Successfully	relay.h
+diagnostics: 1	122	Compilation Started	relay.h
+diagnostics: 1	123	Compiled Successfully	relay.h
+diagnostics: 1	122	Compilation Started	lcd16x2.h
+warning: 7	1509	Generated baud rate is 9615 bps (error = 0.16 percent)	serial.c
+diagnostics: 20	123	Compiled Successfully	serial.c
+diagnostics: 0	122	Compilation Started	rtc.h
+diagnostics: 57	123	Compiled Successfully	rtc.c
+diagnostics: 0	127	All files Compiled in 609 ms	 
+hint: 0	1144	Used RAM (bytes): 58 (16%)  Free RAM (bytes): 294 (84%)	Used RAM (bytes): 58 (16%)  Free RAM (bytes): 294 (84%)
+hint: 0	1144	Used ROM (program words): 492 (6%)  Free ROM (program words): 7700 (94%)	Used ROM (program words): 492 (6%)  Free ROM (program words): 7700 (94%)
+diagnostics: 0	125	Project Linked Successfully	SmartModule.mcppi
+hint: 0	1004	COFF file successfully generated	COFF file successfully generated
+diagnostics: 0	128	Linked in 282 ms	 
+diagnostics: 0	129	Project 'SmartModule.mcppi' completed: 1172 ms	 
+diagnostics: 0	103	Finished successfully: 15 Mar 2016, 08:38:51	SmartModule.mcppi
