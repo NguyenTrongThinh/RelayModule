@@ -54,6 +54,7 @@
 // SEMAPHORE
 //------------------------------------------------------------------------------
 #define OS_ENABLE_CSEM
+#define OS_MSG_TYPE   const char *
 
 #if __OSAVERSION__ >= 90200
 
@@ -62,8 +63,8 @@
 
 #else
 
-#define OST_MSG                unsigned char
-#define OST_SMSG               unsigned char
+#define OST_MSG                unsigned char*
+#define OST_SMSG               unsigned char*
 
 #endif
 

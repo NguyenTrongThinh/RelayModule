@@ -10,228 +10,108 @@ _RTC_init:
 	MOVLW      50
 	MOVWF      SSPADD+0
 	CALL       _I2C1_Init+0
-;rtc.c,9 :: 		}
+;rtc.c,8 :: 		}
 L_end_RTC_init:
 	RETURN
 ; end of _RTC_init
 
 _Transform_Time:
 
-;rtc.c,11 :: 		void Transform_Time(char  *sec, char *min, char *hr, char *week_day, char *day, char *mn, char *year)
-;rtc.c,13 :: 		*sec  =  ((*sec & 0x70) >> 4)*10 + (*sec & 0x0F);
+;rtc.c,10 :: 		void Transform_Time(char  *sec, char *min, char *hr, char *week_day, char *day, char *mn, char *year)
+;rtc.c,12 :: 		*sec  =  Bcd2Dec(*sec);
 	MOVF       FARG_Transform_Time_sec+0, 0
 	MOVWF      FSR
 	MOVF       INDF+0, 0
-	MOVWF      FLOC__Transform_Time+0
-	MOVLW      112
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R2+0
-	MOVF       R2+0, 0
-	MOVWF      R0+0
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	MOVLW      10
-	MOVWF      R4+0
-	CALL       _Mul_8X8_U+0
-	MOVLW      15
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R1+0
-	MOVF       R1+0, 0
-	ADDWF      R0+0, 1
+	MOVWF      FARG_Bcd2Dec_bcdnum+0
+	CALL       _Bcd2Dec+0
 	MOVF       FARG_Transform_Time_sec+0, 0
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,14 :: 		*min  =  ((*min & 0xF0) >> 4)*10 + (*min & 0x0F);
+;rtc.c,13 :: 		*min  =  Bcd2Dec(*min);
 	MOVF       FARG_Transform_Time_min+0, 0
 	MOVWF      FSR
 	MOVF       INDF+0, 0
-	MOVWF      FLOC__Transform_Time+0
-	MOVLW      240
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R2+0
-	MOVF       R2+0, 0
-	MOVWF      R0+0
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	MOVLW      10
-	MOVWF      R4+0
-	CALL       _Mul_8X8_U+0
-	MOVLW      15
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R1+0
-	MOVF       R1+0, 0
-	ADDWF      R0+0, 1
+	MOVWF      FARG_Bcd2Dec_bcdnum+0
+	CALL       _Bcd2Dec+0
 	MOVF       FARG_Transform_Time_min+0, 0
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,15 :: 		*hr   =  ((*hr & 0x30) >> 4)*10 + (*hr & 0x0F);
+;rtc.c,14 :: 		*hr   =   Bcd2Dec(*hr);
 	MOVF       FARG_Transform_Time_hr+0, 0
 	MOVWF      FSR
 	MOVF       INDF+0, 0
-	MOVWF      FLOC__Transform_Time+0
-	MOVLW      48
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R2+0
-	MOVF       R2+0, 0
-	MOVWF      R0+0
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	MOVLW      10
-	MOVWF      R4+0
-	CALL       _Mul_8X8_U+0
-	MOVLW      15
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R1+0
-	MOVF       R1+0, 0
-	ADDWF      R0+0, 1
+	MOVWF      FARG_Bcd2Dec_bcdnum+0
+	CALL       _Bcd2Dec+0
 	MOVF       FARG_Transform_Time_hr+0, 0
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,16 :: 		*week_day =(*week_day & 0x07);
+;rtc.c,15 :: 		*week_day =   Bcd2Dec(*week_day);
 	MOVF       FARG_Transform_Time_week_day+0, 0
 	MOVWF      FSR
-	MOVLW      7
-	ANDWF      INDF+0, 0
-	MOVWF      R0+0
+	MOVF       INDF+0, 0
+	MOVWF      FARG_Bcd2Dec_bcdnum+0
+	CALL       _Bcd2Dec+0
 	MOVF       FARG_Transform_Time_week_day+0, 0
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,17 :: 		*day  =  ((*day & 0xF0) >> 4)*10 + (*day & 0x0F);
+;rtc.c,16 :: 		*day  =   Bcd2Dec(*day);
 	MOVF       FARG_Transform_Time_day+0, 0
 	MOVWF      FSR
 	MOVF       INDF+0, 0
-	MOVWF      FLOC__Transform_Time+0
-	MOVLW      240
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R2+0
-	MOVF       R2+0, 0
-	MOVWF      R0+0
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	MOVLW      10
-	MOVWF      R4+0
-	CALL       _Mul_8X8_U+0
-	MOVLW      15
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R1+0
-	MOVF       R1+0, 0
-	ADDWF      R0+0, 1
+	MOVWF      FARG_Bcd2Dec_bcdnum+0
+	CALL       _Bcd2Dec+0
 	MOVF       FARG_Transform_Time_day+0, 0
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,18 :: 		*mn   =  ((*mn & 0x10) >> 4)*10 + (*mn & 0x0F);
+;rtc.c,17 :: 		*mn   =    Bcd2Dec(*mn);
 	MOVF       FARG_Transform_Time_mn+0, 0
 	MOVWF      FSR
 	MOVF       INDF+0, 0
-	MOVWF      FLOC__Transform_Time+0
-	MOVLW      16
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R2+0
-	MOVF       R2+0, 0
-	MOVWF      R0+0
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	MOVLW      10
-	MOVWF      R4+0
-	CALL       _Mul_8X8_U+0
-	MOVLW      15
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R1+0
-	MOVF       R1+0, 0
-	ADDWF      R0+0, 1
+	MOVWF      FARG_Bcd2Dec_bcdnum+0
+	CALL       _Bcd2Dec+0
 	MOVF       FARG_Transform_Time_mn+0, 0
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,19 :: 		*year =  ((*year & 0xF0)>>4)*10+(*year & 0x0F);
+;rtc.c,18 :: 		*year =    Bcd2Dec(*year);
 	MOVF       FARG_Transform_Time_year+0, 0
 	MOVWF      FSR
 	MOVF       INDF+0, 0
-	MOVWF      FLOC__Transform_Time+0
-	MOVLW      240
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R2+0
-	MOVF       R2+0, 0
-	MOVWF      R0+0
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	RRF        R0+0, 1
-	BCF        R0+0, 7
-	MOVLW      10
-	MOVWF      R4+0
-	CALL       _Mul_8X8_U+0
-	MOVLW      15
-	ANDWF      FLOC__Transform_Time+0, 0
-	MOVWF      R1+0
-	MOVF       R1+0, 0
-	ADDWF      R0+0, 1
+	MOVWF      FARG_Bcd2Dec_bcdnum+0
+	CALL       _Bcd2Dec+0
 	MOVF       FARG_Transform_Time_year+0, 0
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,20 :: 		}
+;rtc.c,19 :: 		}
 L_end_Transform_Time:
 	RETURN
 ; end of _Transform_Time
 
 _Read_Time:
 
-;rtc.c,22 :: 		void Read_Time(char *sec, char *min, char *hr, char *week_day, char *day, char *mn, char *year)
-;rtc.c,24 :: 		I2C1_Start();
+;rtc.c,21 :: 		void Read_Time(char *sec, char *min, char *hr, char *week_day, char *day, char *mn, char *year)
+;rtc.c,23 :: 		I2C1_Start();
 	CALL       _I2C1_Start+0
-;rtc.c,25 :: 		I2C1_Wr(0xD0);
+;rtc.c,24 :: 		I2C1_Wr(0xD0);
 	MOVLW      208
 	MOVWF      FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,26 :: 		I2C1_Wr(0);
+;rtc.c,25 :: 		I2C1_Wr(0);
 	CLRF       FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,27 :: 		I2C1_Repeated_Start();
+;rtc.c,26 :: 		I2C1_Repeated_Start();
 	CALL       _I2C1_Repeated_Start+0
-;rtc.c,28 :: 		I2C1_Wr(0xD1);
+;rtc.c,27 :: 		I2C1_Wr(0xD1);
 	MOVLW      209
 	MOVWF      FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,29 :: 		*sec =I2C1_Rd(1);
+;rtc.c,28 :: 		*sec =I2C1_Rd(1);
 	MOVLW      1
 	MOVWF      FARG_I2C1_Rd_ack+0
 	CALL       _I2C1_Rd+0
@@ -239,7 +119,7 @@ _Read_Time:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,30 :: 		*min =I2C1_Rd(1);
+;rtc.c,29 :: 		*min =I2C1_Rd(1);
 	MOVLW      1
 	MOVWF      FARG_I2C1_Rd_ack+0
 	CALL       _I2C1_Rd+0
@@ -247,7 +127,7 @@ _Read_Time:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,31 :: 		*hr =I2C1_Rd(1);
+;rtc.c,30 :: 		*hr =I2C1_Rd(1);
 	MOVLW      1
 	MOVWF      FARG_I2C1_Rd_ack+0
 	CALL       _I2C1_Rd+0
@@ -255,7 +135,7 @@ _Read_Time:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,32 :: 		*week_day =I2C1_Rd(1);
+;rtc.c,31 :: 		*week_day =I2C1_Rd(1);
 	MOVLW      1
 	MOVWF      FARG_I2C1_Rd_ack+0
 	CALL       _I2C1_Rd+0
@@ -263,7 +143,7 @@ _Read_Time:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,33 :: 		*day =I2C1_Rd(1);
+;rtc.c,32 :: 		*day =I2C1_Rd(1);
 	MOVLW      1
 	MOVWF      FARG_I2C1_Rd_ack+0
 	CALL       _I2C1_Rd+0
@@ -271,7 +151,7 @@ _Read_Time:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,34 :: 		*mn =I2C1_Rd(1);
+;rtc.c,33 :: 		*mn =I2C1_Rd(1);
 	MOVLW      1
 	MOVWF      FARG_I2C1_Rd_ack+0
 	CALL       _I2C1_Rd+0
@@ -279,98 +159,419 @@ _Read_Time:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,35 :: 		*year =I2C1_Rd(0);
+;rtc.c,34 :: 		*year =I2C1_Rd(0);
 	CLRF       FARG_I2C1_Rd_ack+0
 	CALL       _I2C1_Rd+0
 	MOVF       FARG_Read_Time_year+0, 0
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,36 :: 		I2C1_Stop();
+;rtc.c,35 :: 		I2C1_Stop();
 	CALL       _I2C1_Stop+0
-;rtc.c,37 :: 		}
+;rtc.c,36 :: 		}
 L_end_Read_Time:
 	RETURN
 ; end of _Read_Time
 
 _Write_Time:
 
-;rtc.c,38 :: 		void Write_Time(char sec, char min, char hr, char week_day, char day, char mn, char year)
-;rtc.c,40 :: 		I2C1_Start();          // issue start signal
+;rtc.c,37 :: 		void Write_Time(char sec, char min, char hr, char week_day, char day, char mn, char year)
+;rtc.c,39 :: 		I2C1_Start();          // issue start signal
 	CALL       _I2C1_Start+0
-;rtc.c,41 :: 		I2C1_Wr(0xD0);         // address DS1307
+;rtc.c,40 :: 		I2C1_Wr(0xD0);         // address DS1307
 	MOVLW      208
 	MOVWF      FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,42 :: 		I2C1_Wr(0);            // start from word at address (REG0)
+;rtc.c,41 :: 		I2C1_Wr(0);            // start from word at address (REG0)
 	CLRF       FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,43 :: 		I2C1_Wr(Dec2Bcd(sec));       // REG 0
+;rtc.c,42 :: 		I2C1_Wr(Dec2Bcd(sec));       // REG 0
 	MOVF       FARG_Write_Time_sec+0, 0
 	MOVWF      FARG_Dec2Bcd_decnum+0
 	CALL       _Dec2Bcd+0
 	MOVF       R0+0, 0
 	MOVWF      FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,44 :: 		I2C1_Wr(Dec2Bcd(min));       // REG 1
+;rtc.c,43 :: 		I2C1_Wr(Dec2Bcd(min));       // REG 1
 	MOVF       FARG_Write_Time_min+0, 0
 	MOVWF      FARG_Dec2Bcd_decnum+0
 	CALL       _Dec2Bcd+0
 	MOVF       R0+0, 0
 	MOVWF      FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,45 :: 		I2C1_Wr(Dec2Bcd(hr));        // REG 2
+;rtc.c,44 :: 		I2C1_Wr(Dec2Bcd(hr));        // REG 2
 	MOVF       FARG_Write_Time_hr+0, 0
 	MOVWF      FARG_Dec2Bcd_decnum+0
 	CALL       _Dec2Bcd+0
 	MOVF       R0+0, 0
 	MOVWF      FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,46 :: 		I2C1_Wr(Dec2Bcd(week_day));       // REG 3
+;rtc.c,45 :: 		I2C1_Wr(Dec2Bcd(week_day));       // REG 3
 	MOVF       FARG_Write_Time_week_day+0, 0
 	MOVWF      FARG_Dec2Bcd_decnum+0
 	CALL       _Dec2Bcd+0
 	MOVF       R0+0, 0
 	MOVWF      FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,47 :: 		I2C1_Wr(Dec2Bcd(day));       // REG 4
+;rtc.c,46 :: 		I2C1_Wr(Dec2Bcd(day));       // REG 4
 	MOVF       FARG_Write_Time_day+0, 0
 	MOVWF      FARG_Dec2Bcd_decnum+0
 	CALL       _Dec2Bcd+0
 	MOVF       R0+0, 0
 	MOVWF      FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,48 :: 		I2C1_Wr(Dec2Bcd(mn));       // REG 5
+;rtc.c,47 :: 		I2C1_Wr(Dec2Bcd(mn));       // REG 5
 	MOVF       FARG_Write_Time_mn+0, 0
 	MOVWF      FARG_Dec2Bcd_decnum+0
 	CALL       _Dec2Bcd+0
 	MOVF       R0+0, 0
 	MOVWF      FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,49 :: 		I2C1_Wr(Dec2Bcd(year));      // REG 6
+;rtc.c,48 :: 		I2C1_Wr(Dec2Bcd(year));      // REG 6
 	MOVF       FARG_Write_Time_year+0, 0
 	MOVWF      FARG_Dec2Bcd_decnum+0
 	CALL       _Dec2Bcd+0
 	MOVF       R0+0, 0
 	MOVWF      FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,50 :: 		I2C1_Stop();           // issue stop signal
+;rtc.c,49 :: 		I2C1_Stop();           // issue stop signal
 	CALL       _I2C1_Stop+0
-;rtc.c,52 :: 		I2C1_Start();          // issue start signal
+;rtc.c,51 :: 		I2C1_Start();          // issue start signal
 	CALL       _I2C1_Start+0
-;rtc.c,53 :: 		I2C1_Wr(0xD0);         // address DS1307
+;rtc.c,52 :: 		I2C1_Wr(0xD0);         // address DS1307
 	MOVLW      208
 	MOVWF      FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,54 :: 		I2C1_Wr(0);            // start from word at address 0
+;rtc.c,53 :: 		I2C1_Wr(0);            // start from word at address 0
 	CLRF       FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,55 :: 		I2C1_Wr(0);            // write 0 to REG0 (enable counting + 0 sec)
+;rtc.c,54 :: 		I2C1_Wr(0);            // write 0 to REG0 (enable counting + 0 sec)
 	CLRF       FARG_I2C1_Wr_data_+0
 	CALL       _I2C1_Wr+0
-;rtc.c,56 :: 		I2C1_Stop();           // issue stop signal
+;rtc.c,55 :: 		I2C1_Stop();           // issue stop signal
 	CALL       _I2C1_Stop+0
-;rtc.c,57 :: 		}
+;rtc.c,56 :: 		}
 L_end_Write_Time:
 	RETURN
 ; end of _Write_Time
+
+_TimeToString:
+
+;rtc.c,57 :: 		void TimeToString(char sec, char min, char hr, char *outtext)
+;rtc.c,59 :: 		outtext[7] = sec%10 + 48;
+	MOVLW      7
+	ADDWF      FARG_TimeToString_outtext+0, 0
+	MOVWF      FLOC__TimeToString+0
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_TimeToString_sec+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVF       R8+0, 0
+	MOVWF      R0+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FLOC__TimeToString+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,60 :: 		outtext[6] = sec/10 + 48;
+	MOVLW      6
+	ADDWF      FARG_TimeToString_outtext+0, 0
+	MOVWF      FLOC__TimeToString+0
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_TimeToString_sec+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FLOC__TimeToString+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,61 :: 		outtext[5] = ':';
+	MOVLW      5
+	ADDWF      FARG_TimeToString_outtext+0, 0
+	MOVWF      FSR
+	MOVLW      58
+	MOVWF      INDF+0
+;rtc.c,62 :: 		outtext[4] = min%10 + 48;
+	MOVLW      4
+	ADDWF      FARG_TimeToString_outtext+0, 0
+	MOVWF      FLOC__TimeToString+0
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_TimeToString_min+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVF       R8+0, 0
+	MOVWF      R0+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FLOC__TimeToString+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,63 :: 		outtext[3] = min/10 + 48;
+	MOVLW      3
+	ADDWF      FARG_TimeToString_outtext+0, 0
+	MOVWF      FLOC__TimeToString+0
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_TimeToString_min+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FLOC__TimeToString+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,64 :: 		outtext[2] = ':';
+	MOVLW      2
+	ADDWF      FARG_TimeToString_outtext+0, 0
+	MOVWF      FSR
+	MOVLW      58
+	MOVWF      INDF+0
+;rtc.c,65 :: 		outtext[1] = hr%10 + 48;
+	INCF       FARG_TimeToString_outtext+0, 0
+	MOVWF      FLOC__TimeToString+0
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_TimeToString_hr+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVF       R8+0, 0
+	MOVWF      R0+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FLOC__TimeToString+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,66 :: 		outtext[0] = hr/10 + 48;
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_TimeToString_hr+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FARG_TimeToString_outtext+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,67 :: 		}
+L_end_TimeToString:
+	RETURN
+; end of _TimeToString
+
+_DateToString:
+
+;rtc.c,68 :: 		void DateToString(char week_day, char day, char mn, char year, char *outtext)
+;rtc.c,70 :: 		outtext[11] = year%10 + 48;
+	MOVLW      11
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      FLOC__DateToString+0
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_DateToString_year+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVF       R8+0, 0
+	MOVWF      R0+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FLOC__DateToString+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,71 :: 		outtext[10] = year/10 + 48;
+	MOVLW      10
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      FLOC__DateToString+0
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_DateToString_year+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FLOC__DateToString+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,72 :: 		outtext[9] = '-';
+	MOVLW      9
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      FSR
+	MOVLW      45
+	MOVWF      INDF+0
+;rtc.c,73 :: 		outtext[8] = mn%10 + 48;
+	MOVLW      8
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      FLOC__DateToString+0
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_DateToString_mn+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVF       R8+0, 0
+	MOVWF      R0+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FLOC__DateToString+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,74 :: 		outtext[7] = mn/10 + 48;
+	MOVLW      7
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      FLOC__DateToString+0
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_DateToString_mn+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FLOC__DateToString+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,75 :: 		outtext[6] = '-';
+	MOVLW      6
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      FSR
+	MOVLW      45
+	MOVWF      INDF+0
+;rtc.c,76 :: 		outtext[5] = day%10 + 48;
+	MOVLW      5
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      FLOC__DateToString+0
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_DateToString_day+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVF       R8+0, 0
+	MOVWF      R0+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FLOC__DateToString+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,77 :: 		outtext[4] = day/10 + 48;
+	MOVLW      4
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      FLOC__DateToString+0
+	MOVLW      10
+	MOVWF      R4+0
+	MOVF       FARG_DateToString_day+0, 0
+	MOVWF      R0+0
+	CALL       _Div_8X8_U+0
+	MOVLW      48
+	ADDWF      R0+0, 1
+	MOVF       FLOC__DateToString+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,78 :: 		outtext[3] = '-';
+	MOVLW      3
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      FSR
+	MOVLW      45
+	MOVWF      INDF+0
+;rtc.c,79 :: 		outtext[2] = weekday[week_day][2];
+	MOVLW      2
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      R2+0
+	MOVF       FARG_DateToString_week_day+0, 0
+	MOVWF      R0+0
+	RLF        R0+0, 1
+	BCF        R0+0, 0
+	MOVF       R0+0, 0
+	ADDLW      _weekday+0
+	MOVWF      FSR
+	MOVLW      2
+	ADDWF      INDF+0, 0
+	MOVWF      R0+0
+	INCF       FSR, 1
+	MOVF       INDF+0, 0
+	BTFSC      STATUS+0, 0
+	ADDLW      1
+	MOVWF      R0+1
+	MOVF       R0+0, 0
+	MOVWF      ___DoICPAddr+0
+	MOVF       R0+1, 0
+	MOVWF      ___DoICPAddr+1
+	CALL       _____DoICP+0
+	MOVWF      R0+0
+	MOVF       R2+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,80 :: 		outtext[1] = weekday[week_day][1];
+	INCF       FARG_DateToString_outtext+0, 0
+	MOVWF      R2+0
+	MOVF       FARG_DateToString_week_day+0, 0
+	MOVWF      R0+0
+	RLF        R0+0, 1
+	BCF        R0+0, 0
+	MOVF       R0+0, 0
+	ADDLW      _weekday+0
+	MOVWF      FSR
+	MOVF       INDF+0, 0
+	ADDLW      1
+	MOVWF      R0+0
+	MOVLW      0
+	BTFSC      STATUS+0, 0
+	ADDLW      1
+	INCF       FSR, 1
+	ADDWF      INDF+0, 0
+	MOVWF      R0+1
+	MOVF       R0+0, 0
+	MOVWF      ___DoICPAddr+0
+	MOVF       R0+1, 0
+	MOVWF      ___DoICPAddr+1
+	CALL       _____DoICP+0
+	MOVWF      R0+0
+	MOVF       R2+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,81 :: 		outtext[0] = weekday[week_day][0];
+	MOVF       FARG_DateToString_week_day+0, 0
+	MOVWF      R0+0
+	RLF        R0+0, 1
+	BCF        R0+0, 0
+	MOVF       R0+0, 0
+	ADDLW      _weekday+0
+	MOVWF      FSR
+	MOVF       INDF+0, 0
+	MOVWF      R0+0
+	INCF       FSR, 1
+	MOVF       INDF+0, 0
+	MOVWF      R0+1
+	MOVF       R0+0, 0
+	MOVWF      ___DoICPAddr+0
+	MOVF       R0+1, 0
+	MOVWF      ___DoICPAddr+1
+	CALL       _____DoICP+0
+	MOVWF      R0+0
+	MOVF       FARG_DateToString_outtext+0, 0
+	MOVWF      FSR
+	MOVF       R0+0, 0
+	MOVWF      INDF+0
+;rtc.c,82 :: 		}
+L_end_DateToString:
+	RETURN
+; end of _DateToString
+
+rtc____?ag:
+
+L_end_rtc___?ag:
+	RETURN
+; end of rtc____?ag

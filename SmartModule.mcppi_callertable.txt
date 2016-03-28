@@ -1,4 +1,82 @@
 main
+	__CC2DW
+		____DoICP
+	RELAY_TASK
+		_OS_ReturnSave
+			__OS_SET_FSR_CUR_TASK
+		_OS_CheckEvent
+			__OS_SET_FSR_CUR_TASK
+		_OS_DI_INT
+		_OS_Queue_Get
+		Relay_ChangeState
+	LCD_TASK
+		_OS_ReturnSave
+			__OS_SET_FSR_CUR_TASK
+		memset
+		Read_Time
+			I2C1_Start
+				I2C1_Is_Idle
+			I2C1_Wr
+			I2C1_Repeated_Start
+			I2C1_Rd
+			I2C1_Stop
+		Transform_Time
+			Bcd2Dec
+				Mul_8X8_U
+		TimeToString
+			Div_8X8_U
+		lcd16x2_write
+			Lcd_Out
+				Lcd_Cmd
+					Delay_1us
+					Delay_5500us
+					Delay_50us
+				Lcd_Chr_CP
+					Lcd_Cmd
+						Delay_1us
+						Delay_5500us
+						Delay_50us
+		DateToString
+			Div_8X8_U
+			____DoICP
+		_OS_DI_INT
+		_OS_Csem_Signal
+		_OS_Queue_Send
+		_OS_InitDelay
+			__OS_SET_FSR_CUR_TASK
+	USART_TASK
+		_OS_ReturnSave
+			__OS_SET_FSR_CUR_TASK
+		serial_dataready
+			UART1_Data_Ready
+		serial_read
+			UART1_Read
+		serial_process_data
+			memcpy
+		_OS_DI_INT
+		_OS_Csem_Signal
+		_OS_Queue_Send
+		serial_write_text
+			UART1_Write_Text
+				UART1_Write
+		Write_Time
+			I2C1_Start
+				I2C1_Is_Idle
+			I2C1_Wr
+			Dec2Bcd
+				Div_8X8_U
+			I2C1_Stop
+		_OS_InitDelay
+			__OS_SET_FSR_CUR_TASK
+	Relay_Init
+	lcd16x2_init
+		Lcd_Init
+			Delay_5500us
+			Delay_1us
+		Lcd_Cmd
+			Delay_1us
+			Delay_5500us
+			Delay_50us
 	serial_init
 		UART1_Init
 	RTC_init
@@ -6,6 +84,8 @@ main
 	OS_Init
 		_OS_ReturnSave
 			__OS_SET_FSR_CUR_TASK
+	_OS_DI_INT
+	_OS_Task_Create
 	systick_init
 	Mul_8X8_U
 	__OS_SET_FSR_CUR_TASK

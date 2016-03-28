@@ -223,34 +223,203 @@ void _OS_InitDelay( OST_UINT16  Delay);
 
 
  typedef char _Bool;
-#line 3 "d:/pic/relaymodule/module/serial.h"
+#line 6 "d:/pic/relaymodule/module/serial.h"
 void serial_init();
  _Bool  serial_dataready();
 unsigned char serial_read();
 void serial_write_text(char *text);
+ _Bool  serial_process_data(char readata, unsigned char *TyprCmd, char *Value);
 #line 1 "d:/pic/relaymodule/module/rtc.h"
 void RTC_init();
 void Read_Time(char *sec, char *min, char *hr, char *week_day, char *day, char *mn, char *year);
 void Transform_Time(char *sec, char *min, char *hr, char *week_day, char *day, char *mn, char *year);
-void Write_Time(char *sec, char *min, char *hr, char *week_day, char *day, char *mn, char *year);
-#line 8 "D:/PIC/RelayModule/main.c"
+void TimeToString(char sec, char min, char hr, char *outtext);
+void DateToString(char week_day, char day, char mn, char year, char *outtext);
+void Write_Time(char sec, char min, char hr, char week_day, char day, char mn, char year);
+#line 1 "d:/pic/relaymodule/module/relay.h"
+
+
+
+
+
+
+
+
+void Relay_Init();
+void Relay_ChangeState(unsigned char on_off, unsigned char relay_id);
+#line 1 "d:/pic/relaymodule/module/lcd16x2.h"
+
+void lcd16x2_init();
+void lcd16x2_write(unsigned char row, unsigned char col, char *text);
+void lcd16x2_writecp(char *text);
+#line 1 "c:/users/public/documents/mikroelektronika/mikroc pro for pic/include/stdio.h"
+#line 1 "c:/users/public/documents/mikroelektronika/mikroc pro for pic/include/stdlib.h"
+
+
+
+
+
+
+
+ typedef struct divstruct {
+ int quot;
+ int rem;
+ } div_t;
+
+ typedef struct ldivstruct {
+ long quot;
+ long rem;
+ } ldiv_t;
+
+ typedef struct uldivstruct {
+ unsigned long quot;
+ unsigned long rem;
+ } uldiv_t;
+
+int abs(int a);
+float atof(char * s);
+int atoi(char * s);
+long atol(char * s);
+div_t div(int number, int denom);
+ldiv_t ldiv(long number, long denom);
+uldiv_t uldiv(unsigned long number, unsigned long denom);
+long labs(long x);
+int max(int a, int b);
+int min(int a, int b);
+void srand(unsigned x);
+int rand();
+int xtoi(char * s);
+#pragma funcall main RELAY_TASK
+#pragma funcall main LCD_TASK
+#pragma funcall main USART_TASK
+#line 23 "D:/PIC/RelayModule/main.c"
+void RELAY_TASK(void);
+void USART_TASK(void);
+void LCD_TASK(void);
 void systick_init();
+
+OST_CSEM Relay_csem;
+
+OST_QUEUE RELAY_QUEUE;
+OST_MSG RELAY_MSG_QUEUE[ 2 ];
+
+static char sp_sec = 0;
+static char sp_min = 0;
+static char sp_hr = 0;
+static char sp_relay = 0;
 
 int main(void)
 {
+ Relay_Init();
+ lcd16x2_init();
  serial_init();
  RTC_init();
  OS_Init();
-
+   { _OS_DI_INT() ; Relay_csem = 0 ;  { if (_OS_Temp_I & 0x80) GIE_bit  = 1;} ; } ;
+   { ; (RELAY_QUEUE).Q.cSize = 2 ; (RELAY_QUEUE).Q.cBegin = 0; (RELAY_QUEUE).Q.cFilled = 0; (RELAY_QUEUE).pMsg = (OST_MSG*)(RELAY_MSG_QUEUE); ; } ;
+  { _OS_Task_Create( 1 , ( OST_UINT16 )&(RELAY_TASK)); } ;
+  { _OS_Task_Create( 1 , ( OST_UINT16 )&(LCD_TASK)); } ;
+  { _OS_Task_Create( 1 , ( OST_UINT16 )&(USART_TASK)); } ;
  Systick_Init();
   for(;;) { _OS_Flags.bBestTaskFound = 0; _OS_Flags.bCheckingTasks = 1; _OS_Best_Priority = 0; _OS_Worst_Priority = 0; if ( _OS_Flags.bInCriticalSection ) goto _OS_SCHED_CHECK_READY; ; _OS_n = 5 ; do { _OS_Cur_Pos = _OS_TaskQueue[_OS_n-1]; _OS_SCHED_CHECK_READY:  _OS_CurTask = &_OS_Tasks[_OS_Cur_Pos]; __OS_SET_FSR_CUR_TASK() ; if (! ((  OST_TASK_STATE*)&_indf)->bEnable  || ((  OST_TASK_STATE*)&_indf)->bPaused ) goto _OS_SCHED_CONTINUE; ; if (! ((  OST_TASK_STATE*)&_indf)->bReady )  { _OS_SCHED_RUN:; _OS_JumpToTask() ; asm { clrf __status }; asm { movlw hi_addr($) }; asm { movwf __pclath }; ; __OS_SET_FSR_CUR_TASK() ; if (!_OS_Flags.bCheckingTasks) { if ( ((  OST_TASK_STATE*)&_indf)->bReady  || _OS_Flags.bEventOK) { _OS_TaskLevel[_OS_Cur_Pos] -= _OS_Worst_Priority; _OS_n = _OS_Best_n; while (_OS_n) { _OS_TaskQueue[_OS_n] = _OS_TaskQueue[_OS_n-1]; _OS_n--; } _OS_TaskQueue[0] = _OS_Cur_Pos; ; } goto SCHED_END; } } if ( ((  OST_TASK_STATE*)&_indf)->bDelay  && ! ((  OST_TASK_STATE*)&_indf)->bCanContinue ) goto _OS_SCHED_CONTINUE; ; if ( ((  OST_TASK_STATE*)&_indf)->bReady )  { _OS_Temp = _OS_TaskLevel[_OS_Cur_Pos]; if (!(_OS_Temp & 0x80)) { _OS_Temp += 8; _OS_Temp -= _OS_CurTask->State.cPriority; _OS_TaskLevel[_OS_Cur_Pos] = _OS_Temp; } ; if (_OS_Temp > _OS_Best_Priority) { _OS_Worst_Priority = _OS_Best_Priority; _OS_Best_Priority = _OS_Temp; _OS_Best_n = _OS_n-1; _OS_Flags.bBestTaskFound = 1; } else if (_OS_Temp > _OS_Worst_Priority) { _OS_Worst_Priority = _OS_Temp; } } _OS_SCHED_CONTINUE:;  } while ( ! _OS_Flags.bInCriticalSection  && --_OS_n); if (_OS_Flags.bBestTaskFound) { _OS_Flags.bCheckingTasks = 0; _OS_Flags.bEventOK = 0; _OS_Cur_Pos = _OS_TaskQueue[_OS_Best_n]; _OS_CurTask = &_OS_Tasks[_OS_Cur_Pos]; __OS_SET_FSR_CUR_TASK() ; if ( ((  OST_TASK_STATE*)&_indf)->bEnable  && ! ((  OST_TASK_STATE*)&_indf)->bPaused ) goto _OS_SCHED_RUN; } SCHED_END:; } ;
  while(1);
  return 0;
 }
+void USART_TASK(void)
+{
+ char read;
+ unsigned char cmd_Type;
+ static unsigned char param[8];
+ while(1)
+ {
+ if (serial_dataready())
+ {
+ read = serial_read();
+
+ if (serial_process_data(read, &cmd_Type, param))
+ {
+ switch(cmd_Type)
+ {
+ case  0x80 :
+   { for (;;) { _OS_DI_INT() ; _OS_Csem_Signal(&(Relay_csem));  { if (_OS_Temp_I & 0x80) GIE_bit  = 1;} ; if (! _OS_Flags.bEventError ) break; { asm{ movlw hi_addr(__OS_ReturnSave) }; asm{ movwf __pclath }; asm{ movlw $+4 }; asm{ movwf __fsr }; asm{ movlw hi_addr($+0x2)}; asm{ goto __OS_ReturnSave }; } ; } } ;
+   { ; _OS_Queue_Send(&(RELAY_QUEUE), (OST_MSG) (param[0])); ; } ;
+ break;
+ case  0x82 :
+ sp_sec = param[0];
+ sp_min = param[1];
+ sp_hr = param[2];
+ sp_relay = param[3];
+ serial_write_text("Time Set");
+ break;
+ case  0x81 :
+ Write_Time(param[0], param[1], param[2], param[3], param[4], param[5], param[6]);
+ break;
+ }
+ }
+ }
+  { _OS_InitDelay(200); { asm{ movlw hi_addr(__OS_ReturnSave) }; asm{ movwf __pclath }; asm{ movlw $+4 }; asm{ movwf __fsr }; asm{ movlw hi_addr($+0x2)}; asm{ goto __OS_ReturnSave }; } ; } ;
+ }
+}
+void RELAY_TASK(void)
+{
+ OST_MSG state;
+ unsigned char i = 0;
+ unsigned char tmp;
+ while(1)
+ {
+   { for (;;) { { { asm{ movlw hi_addr(__OS_ReturnSave) }; asm{ movwf __pclath }; asm{ bcf __pclath, 0 }; asm{ movlw $+4 }; asm{ movwf __fsr }; asm{ movlw hi_addr($+0x8002) }; asm{ goto __OS_ReturnSave }; } ; if (!_OS_CheckEvent(((Relay_csem != 0)) != 0)) asm{ return} ; } ; _OS_DI_INT() ; if ( (Relay_csem != 0) ) break;  { if (_OS_Temp_I & 0x80) GIE_bit  = 1;} ; } Relay_csem-- ;  { if (_OS_Temp_I & 0x80) GIE_bit  = 1;} ; } ;
+ if ( ((RELAY_QUEUE).Q.cFilled) )
+ {
+   { { { asm{ movlw hi_addr(__OS_ReturnSave) }; asm{ movwf __pclath }; asm{ bcf __pclath, 0 }; asm{ movlw $+4 }; asm{ movwf __fsr }; asm{ movlw hi_addr($+0x8002) }; asm{ goto __OS_ReturnSave }; } ; if (!_OS_CheckEvent((((RELAY_QUEUE).Q.cFilled)) != 0)) asm{ return} ; } ;  { state = _OS_Queue_Get(&(RELAY_QUEUE)); } ; } ;
+ for (i = 0; i < 4; i++)
+ {
+ tmp = (state >> i) & 0x01;
+ if (tmp == 1)
+ {
+ Relay_ChangeState( 1 , i);
+ }
+ else
+ {
+ Relay_ChangeState( 0 , i);
+ }
+ }
+ }
+ }
+}
+void LCD_TASK(void)
+{
+ char sec = 0;
+ char min = 42;
+ char hr = 21;
+ char week_day = 0;
+ char day = 26;
+ char mn = 3;
+ char year = 16;
+ char time[9];
+ char date[13];
+ OST_SMSG msg;
+ memset(time, 0, 9);
+ memset(date, 0, 13);
+ while(1)
+ {
+ Read_Time(&sec, &min, &hr, &week_day, &day, &mn, &year);
+ Transform_Time(&sec, &min, &hr, &week_day, &day, &mn, &year);
+ TimeToString(sec, min, hr, time);
+ lcd16x2_write(1, 1, time);
+ DateToString(week_day, day, mn, year, date);
+ lcd16x2_write(2, 1, date+4);
+ if (sec == sp_sec && min == sp_min && hr == sp_hr)
+ {
+   { for (;;) { _OS_DI_INT() ; _OS_Csem_Signal(&(Relay_csem));  { if (_OS_Temp_I & 0x80) GIE_bit  = 1;} ; if (! _OS_Flags.bEventError ) break; { asm{ movlw hi_addr(__OS_ReturnSave) }; asm{ movwf __pclath }; asm{ movlw $+4 }; asm{ movwf __fsr }; asm{ movlw hi_addr($+0x2)}; asm{ goto __OS_ReturnSave }; } ; } } ;
+   { ; _OS_Queue_Send(&(RELAY_QUEUE), (OST_MSG) ((OST_MSG)sp_relay)); ; } ;
+ }
+  { _OS_InitDelay(100); { asm{ movlw hi_addr(__OS_ReturnSave) }; asm{ movwf __pclath }; asm{ movlw $+4 }; asm{ movwf __fsr }; asm{ movlw hi_addr($+0x2)}; asm{ goto __OS_ReturnSave }; } ; } ;
+ }
+}
 void systick_init()
 {
- T2CON = 0x36;
- PR2 = 223;
+ T2CON = 0x25;
+ PR2 = 250;
  TMR2IE_bit = 1;
  INTCON = 0xC0;
 }

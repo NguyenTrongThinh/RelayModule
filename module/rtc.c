@@ -1,22 +1,21 @@
 #include "rtc.h"
-
+const char* weekday[7] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
 void RTC_init()
 {
    ANSEL=0;
    ANSELH=0;
    I2C1_Init(100000);                        // initialize I2C
-   
 }
 
 void Transform_Time(char  *sec, char *min, char *hr, char *week_day, char *day, char *mn, char *year)
 {
-  *sec  =  ((*sec & 0x70) >> 4)*10 + (*sec & 0x0F);
-  *min  =  ((*min & 0xF0) >> 4)*10 + (*min & 0x0F);
-  *hr   =  ((*hr & 0x30) >> 4)*10 + (*hr & 0x0F);
-  *week_day =(*week_day & 0x07);
-  *day  =  ((*day & 0xF0) >> 4)*10 + (*day & 0x0F);
-  *mn   =  ((*mn & 0x10) >> 4)*10 + (*mn & 0x0F);
-  *year =  ((*year & 0xF0)>>4)*10+(*year & 0x0F);
+  *sec  =  Bcd2Dec(*sec);
+  *min  =  Bcd2Dec(*min);
+  *hr   =   Bcd2Dec(*hr);
+  *week_day =   Bcd2Dec(*week_day);
+  *day  =   Bcd2Dec(*day);
+  *mn   =    Bcd2Dec(*mn);
+  *year =    Bcd2Dec(*year);
 }
 
 void Read_Time(char *sec, char *min, char *hr, char *week_day, char *day, char *mn, char *year)
@@ -54,4 +53,30 @@ void Write_Time(char sec, char min, char hr, char week_day, char day, char mn, c
    I2C1_Wr(0);            // start from word at address 0
    I2C1_Wr(0);            // write 0 to REG0 (enable counting + 0 sec)
    I2C1_Stop();           // issue stop signal
+}
+void TimeToString(char sec, char min, char hr, char *outtext)
+{
+ outtext[7] = sec%10 + 48;
+ outtext[6] = sec/10 + 48;
+ outtext[5] = ':';
+ outtext[4] = min%10 + 48;
+ outtext[3] = min/10 + 48;
+ outtext[2] = ':';
+ outtext[1] = hr%10 + 48;
+ outtext[0] = hr/10 + 48;
+}
+void DateToString(char week_day, char day, char mn, char year, char *outtext)
+{
+ outtext[11] = year%10 + 48;
+ outtext[10] = year/10 + 48;
+ outtext[9] = '-';
+ outtext[8] = mn%10 + 48;
+ outtext[7] = mn/10 + 48;
+ outtext[6] = '-';
+ outtext[5] = day%10 + 48;
+ outtext[4] = day/10 + 48;
+ outtext[3] = '-';
+ outtext[2] = weekday[week_day][2];
+ outtext[1] = weekday[week_day][1];
+ outtext[0] = weekday[week_day][0];
 }
