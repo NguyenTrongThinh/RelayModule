@@ -72,7 +72,7 @@ File4=module\rtc.h
 [PLDS]
 Count=0
 [Useses]
-Count=11
+Count=12
 File0=ADC
 File1=C_Math
 File2=C_Stdlib
@@ -84,6 +84,7 @@ File7=Lcd_Constants
 File8=UART
 File9=I2C
 File10=MemManager
+File11=FLASH
 [EXPANDED_NODES]
 Node0=Sources
 Node1=Header Files

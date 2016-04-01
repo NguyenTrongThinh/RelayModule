@@ -5,13 +5,13 @@
 
 
  typedef char _Bool;
-#line 6 "d:/pic/relaymodule/module/serial.h"
+#line 7 "d:/pic/relaymodule/module/serial.h"
 void serial_init();
  _Bool  serial_dataready();
 unsigned char serial_read();
 void serial_write_text(char *text);
  _Bool  serial_process_data(char readata, unsigned char *TyprCmd, char *Value);
-#line 9 "D:/PIC/RelayModule/module/serial.c"
+#line 11 "D:/PIC/RelayModule/module/serial.c"
 static unsigned char ReadData[10];
 static unsigned char index = 0;
 void serial_init()

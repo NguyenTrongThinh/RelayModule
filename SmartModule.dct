@@ -308,6 +308,7 @@ cm2con0
 cm2con1
 comfrem
 compare_double
+comparetime
 cos
 cosh
 cren
@@ -393,6 +394,8 @@ fabs
 ferr
 ferr_bit
 fixsign32
+flash_read
+flash_write
 floattostr
 floor
 freemem

@@ -370,8 +370,8 @@ L_end_TimeToString:
 _DateToString:
 
 ;rtc.c,68 :: 		void DateToString(char week_day, char day, char mn, char year, char *outtext)
-;rtc.c,70 :: 		outtext[11] = year%10 + 48;
-	MOVLW      11
+;rtc.c,70 :: 		outtext[13] = year%10 + 48;
+	MOVLW      13
 	ADDWF      FARG_DateToString_outtext+0, 0
 	MOVWF      FLOC__DateToString+0
 	MOVLW      10
@@ -387,8 +387,8 @@ _DateToString:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,71 :: 		outtext[10] = year/10 + 48;
-	MOVLW      10
+;rtc.c,71 :: 		outtext[12] = year/10 + 48;
+	MOVLW      12
 	ADDWF      FARG_DateToString_outtext+0, 0
 	MOVWF      FLOC__DateToString+0
 	MOVLW      10
@@ -402,13 +402,25 @@ _DateToString:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,72 :: 		outtext[9] = '-';
+;rtc.c,72 :: 		outtext[11] = '0';
+	MOVLW      11
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      FSR
+	MOVLW      48
+	MOVWF      INDF+0
+;rtc.c,73 :: 		outtext[10] = '2';
+	MOVLW      10
+	ADDWF      FARG_DateToString_outtext+0, 0
+	MOVWF      FSR
+	MOVLW      50
+	MOVWF      INDF+0
+;rtc.c,74 :: 		outtext[9] = '-';
 	MOVLW      9
 	ADDWF      FARG_DateToString_outtext+0, 0
 	MOVWF      FSR
 	MOVLW      45
 	MOVWF      INDF+0
-;rtc.c,73 :: 		outtext[8] = mn%10 + 48;
+;rtc.c,75 :: 		outtext[8] = mn%10 + 48;
 	MOVLW      8
 	ADDWF      FARG_DateToString_outtext+0, 0
 	MOVWF      FLOC__DateToString+0
@@ -425,7 +437,7 @@ _DateToString:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,74 :: 		outtext[7] = mn/10 + 48;
+;rtc.c,76 :: 		outtext[7] = mn/10 + 48;
 	MOVLW      7
 	ADDWF      FARG_DateToString_outtext+0, 0
 	MOVWF      FLOC__DateToString+0
@@ -440,13 +452,13 @@ _DateToString:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,75 :: 		outtext[6] = '-';
+;rtc.c,77 :: 		outtext[6] = '-';
 	MOVLW      6
 	ADDWF      FARG_DateToString_outtext+0, 0
 	MOVWF      FSR
 	MOVLW      45
 	MOVWF      INDF+0
-;rtc.c,76 :: 		outtext[5] = day%10 + 48;
+;rtc.c,78 :: 		outtext[5] = day%10 + 48;
 	MOVLW      5
 	ADDWF      FARG_DateToString_outtext+0, 0
 	MOVWF      FLOC__DateToString+0
@@ -463,7 +475,7 @@ _DateToString:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,77 :: 		outtext[4] = day/10 + 48;
+;rtc.c,79 :: 		outtext[4] = day/10 + 48;
 	MOVLW      4
 	ADDWF      FARG_DateToString_outtext+0, 0
 	MOVWF      FLOC__DateToString+0
@@ -478,19 +490,28 @@ _DateToString:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,78 :: 		outtext[3] = '-';
+;rtc.c,80 :: 		outtext[3] = '-';
 	MOVLW      3
 	ADDWF      FARG_DateToString_outtext+0, 0
 	MOVWF      FSR
 	MOVLW      45
 	MOVWF      INDF+0
-;rtc.c,79 :: 		outtext[2] = weekday[week_day][2];
+;rtc.c,81 :: 		outtext[2] = weekday[week_day - 1][2];
 	MOVLW      2
 	ADDWF      FARG_DateToString_outtext+0, 0
-	MOVWF      R2+0
-	MOVF       FARG_DateToString_week_day+0, 0
+	MOVWF      R5+0
+	MOVLW      1
+	SUBWF      FARG_DateToString_week_day+0, 0
+	MOVWF      R3+0
+	CLRF       R3+1
+	BTFSS      STATUS+0, 0
+	DECF       R3+1, 1
+	MOVF       R3+0, 0
 	MOVWF      R0+0
+	MOVF       R3+1, 0
+	MOVWF      R0+1
 	RLF        R0+0, 1
+	RLF        R0+1, 1
 	BCF        R0+0, 0
 	MOVF       R0+0, 0
 	ADDLW      _weekday+0
@@ -509,16 +530,25 @@ _DateToString:
 	MOVWF      ___DoICPAddr+1
 	CALL       _____DoICP+0
 	MOVWF      R0+0
-	MOVF       R2+0, 0
+	MOVF       R5+0, 0
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,80 :: 		outtext[1] = weekday[week_day][1];
+;rtc.c,82 :: 		outtext[1] = weekday[week_day - 1][1];
 	INCF       FARG_DateToString_outtext+0, 0
-	MOVWF      R2+0
-	MOVF       FARG_DateToString_week_day+0, 0
+	MOVWF      R5+0
+	MOVLW      1
+	SUBWF      FARG_DateToString_week_day+0, 0
+	MOVWF      R3+0
+	CLRF       R3+1
+	BTFSS      STATUS+0, 0
+	DECF       R3+1, 1
+	MOVF       R3+0, 0
 	MOVWF      R0+0
+	MOVF       R3+1, 0
+	MOVWF      R0+1
 	RLF        R0+0, 1
+	RLF        R0+1, 1
 	BCF        R0+0, 0
 	MOVF       R0+0, 0
 	ADDLW      _weekday+0
@@ -538,14 +568,23 @@ _DateToString:
 	MOVWF      ___DoICPAddr+1
 	CALL       _____DoICP+0
 	MOVWF      R0+0
-	MOVF       R2+0, 0
+	MOVF       R5+0, 0
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,81 :: 		outtext[0] = weekday[week_day][0];
-	MOVF       FARG_DateToString_week_day+0, 0
+;rtc.c,83 :: 		outtext[0] = weekday[week_day - 1][0];
+	MOVLW      1
+	SUBWF      FARG_DateToString_week_day+0, 0
+	MOVWF      R3+0
+	CLRF       R3+1
+	BTFSS      STATUS+0, 0
+	DECF       R3+1, 1
+	MOVF       R3+0, 0
 	MOVWF      R0+0
+	MOVF       R3+1, 0
+	MOVWF      R0+1
 	RLF        R0+0, 1
+	RLF        R0+1, 1
 	BCF        R0+0, 0
 	MOVF       R0+0, 0
 	ADDLW      _weekday+0
@@ -565,7 +604,7 @@ _DateToString:
 	MOVWF      FSR
 	MOVF       R0+0, 0
 	MOVWF      INDF+0
-;rtc.c,82 :: 		}
+;rtc.c,84 :: 		}
 L_end_DateToString:
 	RETURN
 ; end of _DateToString

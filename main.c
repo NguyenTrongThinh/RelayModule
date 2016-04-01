@@ -15,6 +15,7 @@
 #define USART_TASK_PRIORITY            1
 
 #define RELAY_MSG_LENGTH               2
+#define MAX_STORAGE_TIME               3
 
 #pragma funcall main RELAY_TASK
 #pragma funcall main LCD_TASK
@@ -23,6 +24,7 @@
 void RELAY_TASK(void);
 void USART_TASK(void);
 void LCD_TASK(void);
+bool CompareTime(char sec, char min, char hr, char week_day, char day, char mn, char year, char *Index);
 void systick_init();
 
 OST_CSEM Relay_csem;
@@ -30,10 +32,16 @@ OST_CSEM Relay_csem;
 OST_QUEUE RELAY_QUEUE;
 OST_MSG RELAY_MSG_QUEUE[RELAY_MSG_LENGTH];
 
-static char sp_sec = 0;
-static char sp_min = 0;
-static char sp_hr = 0;
-static char sp_relay = 0;
+static char sp_sec[MAX_STORAGE_TIME];
+static char sp_min[MAX_STORAGE_TIME];
+static char sp_hr[MAX_STORAGE_TIME];
+static char sp_weekday[MAX_STORAGE_TIME];
+static char sp_day[MAX_STORAGE_TIME];
+static char sp_mn[MAX_STORAGE_TIME];
+static char sp_year[MAX_STORAGE_TIME];
+static char sp_relay[MAX_STORAGE_TIME];
+
+static char currentindex = -1;
 
 int main(void)
 {
@@ -72,11 +80,16 @@ void USART_TASK(void)
             OS_Queue_Send_Now(RELAY_QUEUE, param[0]);
             break;
        case RELAY_OFF_TIME_CMD_CODE:
-            sp_sec = param[0];
-            sp_min = param[1];
-            sp_hr = param[2];
-            sp_relay = param[3];
-            serial_write_text("Time Set");
+            currentindex = (currentindex +1) % MAX_STORAGE_TIME;
+            sp_sec[currentindex] = param[0];
+            sp_min[currentindex] = param[1];
+            sp_hr[currentindex] = param[2];
+            sp_weekday[currentindex] = 0;
+            sp_day[currentindex] = 0;
+            sp_mn[currentindex] = 0;
+            sp_year[currentindex] = 0;
+            sp_relay[currentindex] = 0;
+            sp_relay[currentindex] = param[3];
             break;
        case RTC_TIME_SET_CMD_CODE:
             Write_Time(param[0], param[1], param[2], param[3], param[4], param[5], param[6]);
@@ -84,7 +97,7 @@ void USART_TASK(void)
        }
       }
    }
-   OS_Delay(200);
+   OS_Delay(150);
  }
 }
 void RELAY_TASK(void)
@@ -123,25 +136,43 @@ void LCD_TASK(void)
  char mn = 3;
  char year = 16;
  char time[9];
- char date[13];
+ char date[15];
+ char Index;
  OST_SMSG msg;
  memset(time, 0, 9);
- memset(date, 0, 13);
+ memset(date, 0, 15);
  while(1)
  {
    Read_Time(&sec, &min, &hr, &week_day, &day, &mn, &year);
    Transform_Time(&sec, &min, &hr, &week_day, &day, &mn, &year);
    TimeToString(sec, min, hr, time);
-   lcd16x2_write(1, 1, time);
+   lcd16x2_write(1, 5, time);
    DateToString(week_day, day, mn, year, date);
-   lcd16x2_write(2, 1, date+4);
-   if (sec == sp_sec && min == sp_min && hr == sp_hr)
+   lcd16x2_write(2, 2, date);
+   if (CompareTime(sec, min, hr, week_day, day, mn, year, &Index))
    {
         OS_Csem_Signal(Relay_csem);
-        OS_Queue_Send_Now(RELAY_QUEUE, (OST_MSG)sp_relay);
+        OS_Queue_Send_Now(RELAY_QUEUE, (OST_MSG)sp_relay[Index]);
    }
-   OS_Delay(100);
+   OS_Delay(500);
  }
+}
+bool CompareTime(char sec, char min, char hr, char week_day, char day, char mn, char year, char *Index)
+{
+ char i = 0;
+ bool returnval = false;
+ for ( i = 0; i < MAX_STORAGE_TIME; i++)
+ {
+  if (sec == sp_sec[i] && min == sp_min[i] && hr ==  sp_hr[i] &&
+      week_day == sp_weekday[i] &&  day == sp_day[i] && mn == sp_mn[i] &&
+      year ==  sp_relay[i])
+      {
+          *Index = i;
+          returnval = true;
+          break;
+      }
+ }
+ return returnval;
 }
 void systick_init()
 {

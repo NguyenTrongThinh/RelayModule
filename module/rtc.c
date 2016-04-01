@@ -1,5 +1,5 @@
 #include "rtc.h"
-const char* weekday[7] = {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+const char* weekday[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 void RTC_init()
 {
    ANSEL=0;
@@ -67,8 +67,10 @@ void TimeToString(char sec, char min, char hr, char *outtext)
 }
 void DateToString(char week_day, char day, char mn, char year, char *outtext)
 {
- outtext[11] = year%10 + 48;
- outtext[10] = year/10 + 48;
+ outtext[13] = year%10 + 48;
+ outtext[12] = year/10 + 48;
+ outtext[11] = '0';
+ outtext[10] = '2';
  outtext[9] = '-';
  outtext[8] = mn%10 + 48;
  outtext[7] = mn/10 + 48;
@@ -76,7 +78,7 @@ void DateToString(char week_day, char day, char mn, char year, char *outtext)
  outtext[5] = day%10 + 48;
  outtext[4] = day/10 + 48;
  outtext[3] = '-';
- outtext[2] = weekday[week_day][2];
- outtext[1] = weekday[week_day][1];
- outtext[0] = weekday[week_day][0];
+ outtext[2] = weekday[week_day - 1][2];
+ outtext[1] = weekday[week_day - 1][1];
+ outtext[0] = weekday[week_day - 1][0];
 }

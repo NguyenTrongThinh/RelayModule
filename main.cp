@@ -223,7 +223,7 @@ void _OS_InitDelay( OST_UINT16  Delay);
 
 
  typedef char _Bool;
-#line 6 "d:/pic/relaymodule/module/serial.h"
+#line 7 "d:/pic/relaymodule/module/serial.h"
 void serial_init();
  _Bool  serial_dataready();
 unsigned char serial_read();
@@ -292,10 +292,11 @@ int xtoi(char * s);
 #pragma funcall main RELAY_TASK
 #pragma funcall main LCD_TASK
 #pragma funcall main USART_TASK
-#line 23 "D:/PIC/RelayModule/main.c"
+#line 24 "D:/PIC/RelayModule/main.c"
 void RELAY_TASK(void);
 void USART_TASK(void);
 void LCD_TASK(void);
+ _Bool  CompareTime(char sec, char min, char hr, char week_day, char day, char mn, char year, char *Index);
 void systick_init();
 
 OST_CSEM Relay_csem;
@@ -303,10 +304,16 @@ OST_CSEM Relay_csem;
 OST_QUEUE RELAY_QUEUE;
 OST_MSG RELAY_MSG_QUEUE[ 2 ];
 
-static char sp_sec = 0;
-static char sp_min = 0;
-static char sp_hr = 0;
-static char sp_relay = 0;
+static char sp_sec[ 3 ];
+static char sp_min[ 3 ];
+static char sp_hr[ 3 ];
+static char sp_weekday[ 3 ];
+static char sp_day[ 3 ];
+static char sp_mn[ 3 ];
+static char sp_year[ 3 ];
+static char sp_relay[ 3 ];
+
+static char currentindex = -1;
 
 int main(void)
 {
@@ -345,11 +352,16 @@ void USART_TASK(void)
    { ; _OS_Queue_Send(&(RELAY_QUEUE), (OST_MSG) (param[0])); ; } ;
  break;
  case  0x82 :
- sp_sec = param[0];
- sp_min = param[1];
- sp_hr = param[2];
- sp_relay = param[3];
- serial_write_text("Time Set");
+ currentindex = (currentindex +1) %  3 ;
+ sp_sec[currentindex] = param[0];
+ sp_min[currentindex] = param[1];
+ sp_hr[currentindex] = param[2];
+ sp_weekday[currentindex] = 0;
+ sp_day[currentindex] = 0;
+ sp_mn[currentindex] = 0;
+ sp_year[currentindex] = 0;
+ sp_relay[currentindex] = 0;
+ sp_relay[currentindex] = param[3];
  break;
  case  0x81 :
  Write_Time(param[0], param[1], param[2], param[3], param[4], param[5], param[6]);
@@ -357,7 +369,7 @@ void USART_TASK(void)
  }
  }
  }
-  { _OS_InitDelay(200); { asm{ movlw hi_addr(__OS_ReturnSave) }; asm{ movwf __pclath }; asm{ movlw $+4 }; asm{ movwf __fsr }; asm{ movlw hi_addr($+0x2)}; asm{ goto __OS_ReturnSave }; } ; } ;
+  { _OS_InitDelay(150); { asm{ movlw hi_addr(__OS_ReturnSave) }; asm{ movwf __pclath }; asm{ movlw $+4 }; asm{ movwf __fsr }; asm{ movlw hi_addr($+0x2)}; asm{ goto __OS_ReturnSave }; } ; } ;
  }
 }
 void RELAY_TASK(void)
@@ -396,25 +408,43 @@ void LCD_TASK(void)
  char mn = 3;
  char year = 16;
  char time[9];
- char date[13];
+ char date[15];
+ char Index;
  OST_SMSG msg;
  memset(time, 0, 9);
- memset(date, 0, 13);
+ memset(date, 0, 15);
  while(1)
  {
  Read_Time(&sec, &min, &hr, &week_day, &day, &mn, &year);
  Transform_Time(&sec, &min, &hr, &week_day, &day, &mn, &year);
  TimeToString(sec, min, hr, time);
- lcd16x2_write(1, 1, time);
+ lcd16x2_write(1, 5, time);
  DateToString(week_day, day, mn, year, date);
- lcd16x2_write(2, 1, date+4);
- if (sec == sp_sec && min == sp_min && hr == sp_hr)
+ lcd16x2_write(2, 2, date);
+ if (CompareTime(sec, min, hr, week_day, day, mn, year, &Index))
  {
    { for (;;) { _OS_DI_INT() ; _OS_Csem_Signal(&(Relay_csem));  { if (_OS_Temp_I & 0x80) GIE_bit  = 1;} ; if (! _OS_Flags.bEventError ) break; { asm{ movlw hi_addr(__OS_ReturnSave) }; asm{ movwf __pclath }; asm{ movlw $+4 }; asm{ movwf __fsr }; asm{ movlw hi_addr($+0x2)}; asm{ goto __OS_ReturnSave }; } ; } } ;
-   { ; _OS_Queue_Send(&(RELAY_QUEUE), (OST_MSG) ((OST_MSG)sp_relay)); ; } ;
+   { ; _OS_Queue_Send(&(RELAY_QUEUE), (OST_MSG) ((OST_MSG)sp_relay[Index])); ; } ;
  }
-  { _OS_InitDelay(100); { asm{ movlw hi_addr(__OS_ReturnSave) }; asm{ movwf __pclath }; asm{ movlw $+4 }; asm{ movwf __fsr }; asm{ movlw hi_addr($+0x2)}; asm{ goto __OS_ReturnSave }; } ; } ;
+  { _OS_InitDelay(500); { asm{ movlw hi_addr(__OS_ReturnSave) }; asm{ movwf __pclath }; asm{ movlw $+4 }; asm{ movwf __fsr }; asm{ movlw hi_addr($+0x2)}; asm{ goto __OS_ReturnSave }; } ; } ;
  }
+}
+ _Bool  CompareTime(char sec, char min, char hr, char week_day, char day, char mn, char year, char *Index)
+{
+ char i = 0;
+  _Bool  returnval =  0 ;
+ for ( i = 0; i <  3 ; i++)
+ {
+ if (sec == sp_sec[i] && min == sp_min[i] && hr == sp_hr[i] &&
+ week_day == sp_weekday[i] && day == sp_day[i] && mn == sp_mn[i] &&
+ year == sp_relay[i])
+ {
+ *Index = i;
+ returnval =  1 ;
+ break;
+ }
+ }
+ return returnval;
 }
 void systick_init()
 {

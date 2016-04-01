@@ -2,9 +2,11 @@
 #ifndef BAUDRATE
         #define BAUDRATE        9600
 #endif
-#define RELAY_STATUS_CMD_CODE 0x80        //Set Trang thai relay hien tai
-#define RTC_TIME_SET_CMD_CODE 0x81        //Set ngayf giowf cho DS1307
-#define RELAY_OFF_TIME_CMD_CODE 0x82      //Hen gio tat
+#define RELAY_STATUS_CMD_CODE                   0x80        //Set Trang thai relay hien tai
+#define RTC_TIME_SET_CMD_CODE                   0x81        //Set ngayf giowf cho DS1307
+#define RELAY_OFF_TIME_CMD_CODE                 0x82      //Hen gio tat
+#define GET_CURRENT_RELAY_SETTING               0x83
+
 #define END_CMD 0xFF
 static unsigned char ReadData[10];
 static unsigned char index = 0;

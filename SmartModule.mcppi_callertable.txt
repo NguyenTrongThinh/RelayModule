@@ -39,6 +39,7 @@ main
 		DateToString
 			Div_8X8_U
 			____DoICP
+		CompareTime
 		_OS_DI_INT
 		_OS_Csem_Signal
 		_OS_Queue_Send
@@ -56,9 +57,8 @@ main
 		_OS_DI_INT
 		_OS_Csem_Signal
 		_OS_Queue_Send
-		serial_write_text
-			UART1_Write_Text
-				UART1_Write
+		Div_16x16_S
+			Div_16x16_S_L
 		Write_Time
 			I2C1_Start
 				I2C1_Is_Idle
